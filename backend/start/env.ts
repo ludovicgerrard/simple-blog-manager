@@ -22,10 +22,13 @@ export default await Env.create(new URL('../', import.meta.url), {
   |----------------------------------------------------------
   | Variables for configuring database connection
   |----------------------------------------------------------
+  | Using SQLite by default. You can override the DB filename with SQLITE_DB_NAME.
+  | Keeping MySQL variables optional for compatibility if you switch back.
   */
-  DB_HOST: Env.schema.string({ format: 'host' }),
-  DB_PORT: Env.schema.number(),
-  DB_USER: Env.schema.string(),
+  SQLITE_DB_NAME: Env.schema.string.optional(),
+  DB_HOST: Env.schema.string.optional({ format: 'host' }),
+  DB_PORT: Env.schema.number.optional(),
+  DB_USER: Env.schema.string.optional(),
   DB_PASSWORD: Env.schema.string.optional(),
-  DB_DATABASE: Env.schema.string()
+  DB_DATABASE: Env.schema.string.optional(),
 })
