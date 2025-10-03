@@ -1,6 +1,6 @@
-# User Management API Testing Guide
+# User Management & Blog API Testing Guide
 
-This document shows how to test all the user management endpoints that have been implemented.
+This document shows how to test all the user management and blog endpoints that have been implemented.
 
 ## Prerequisites
 
@@ -317,3 +317,238 @@ You can import these curl commands into Postman or create a collection with the 
    - Auth/Logout (POST {{base_url}}/api/auth/logout)
 
 For protected endpoints, add Authorization header with value: `Bearer {{token}}`
+
+## Blog API Endpoints
+
+### Public Blog Routes (No Authentication)
+
+#### 1. List All Posts
+
+**GET** `/api/blog/posts`
+
+Query Parameters:
+
+- `page` (optional): Page number (default: 1)
+- `limit` (optional): Posts per page (default: 10)
+
+```bash
+curl -X GET "http://localhost:3333/api/blog/posts?page=1&limit=5"
+```
+
+Success Response (200):
+
+```json
+{
+  "success": true,
+  "data": {
+    "posts": {
+      "meta": {
+        "total": 10,
+        "perPage": 5,
+        "currentPage": 1,
+        "lastPage": 2
+      },
+      "data": [
+        {
+          "id": 1,
+          "title": "My First Blog Post",
+          "content": "This is the content of my blog post...",
+          "authorId": 1,
+          "createdAt": "2025-01-02T15:30:00.000Z",
+          "updatedAt": "2025-01-02T15:30:00.000Z",
+          "author": {
+            "id": 1,
+            "fullName": "John Doe",
+            "email": "john@example.com"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+#### 2. View Single Post
+
+**GET** `/api/blog/posts/:id`
+
+```bash
+curl -X GET http://localhost:3333/api/blog/posts/1
+```
+
+Success Response (200):
+
+```json
+{
+  "success": true,
+  "data": {
+    "post": {
+      "id": 1,
+      "title": "My First Blog Post",
+      "content": "This is the content of my blog post...",
+      "authorId": 1,
+      "createdAt": "2025-01-02T15:30:00.000Z",
+      "updatedAt": "2025-01-02T15:30:00.000Z",
+      "author": {
+        "id": 1,
+        "fullName": "John Doe",
+        "email": "john@example.com"
+      }
+    }
+  }
+}
+```
+
+Error Response (404):
+
+```json
+{
+  "success": false,
+  "message": "Post not found"
+}
+```
+
+### Protected Blog Routes (Authentication Required)
+
+#### 3. Create New Post
+
+**POST** `/api/blog/posts`
+
+```bash
+curl -X POST http://localhost:3333/api/blog/posts \
+  -H "Authorization: Bearer your-access-token-here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "My New Blog Post",
+    "content": "This is the content of my new blog post with detailed information."
+  }'
+```
+
+Success Response (201):
+
+```json
+{
+  "success": true,
+  "message": "Post created successfully",
+  "data": {
+    "post": {
+      "id": 2,
+      "title": "My New Blog Post",
+      "content": "This is the content of my new blog post with detailed information.",
+      "authorId": 1,
+      "createdAt": "2025-01-02T16:00:00.000Z",
+      "updatedAt": "2025-01-02T16:00:00.000Z",
+      "author": {
+        "id": 1,
+        "fullName": "John Doe",
+        "email": "john@example.com"
+      }
+    }
+  }
+}
+```
+
+#### 4. Update Post (Author Only)
+
+**PUT** `/api/blog/posts/:id`
+
+```bash
+curl -X PUT http://localhost:3333/api/blog/posts/2 \
+  -H "Authorization: Bearer your-access-token-here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Updated Blog Post Title",
+    "content": "Updated content for the blog post."
+  }'
+```
+
+Success Response (200):
+
+```json
+{
+  "success": true,
+  "message": "Post updated successfully",
+  "data": {
+    "post": {
+      "id": 2,
+      "title": "Updated Blog Post Title",
+      "content": "Updated content for the blog post.",
+      "authorId": 1,
+      "createdAt": "2025-01-02T16:00:00.000Z",
+      "updatedAt": "2025-01-02T16:15:00.000Z",
+      "author": {
+        "id": 1,
+        "fullName": "John Doe",
+        "email": "john@example.com"
+      }
+    }
+  }
+}
+```
+
+Error Response (403 - Not the author):
+
+```json
+{
+  "success": false,
+  "message": "You can only edit your own posts"
+}
+```
+
+#### 5. Delete Post (Author Only)
+
+**DELETE** `/api/blog/posts/:id`
+
+```bash
+curl -X DELETE http://localhost:3333/api/blog/posts/2 \
+  -H "Authorization: Bearer your-access-token-here"
+```
+
+Success Response (200):
+
+```json
+{
+  "success": true,
+  "message": "Post deleted successfully"
+}
+```
+
+Error Response (403 - Not the author):
+
+```json
+{
+  "success": false,
+  "message": "You can only delete your own posts"
+}
+```
+
+## Blog Validation Rules
+
+### Creating/Updating Posts
+
+- `title`: Required (when creating), 1-255 characters, automatically trimmed
+- `content`: Required (when creating), 1-10000 characters, automatically trimmed
+- Author is automatically set to the authenticated user
+- Both fields are secured against SQL injection through ORM and validation
+
+### Security Features
+
+- **Input Sanitization**: All inputs are trimmed and validated
+- **SQL Injection Prevention**: Uses Lucid ORM with parameterized queries
+- **Authorization**: Users can only edit/delete their own posts
+- **Content Length Limits**: Prevents excessive content submission
+
+## Extended Postman Collection
+
+Add these endpoints to your Postman collection:
+
+**Public Blog Endpoints:**
+
+- List Posts (GET {{base_url}}/api/blog/posts)
+- View Post (GET {{base_url}}/api/blog/posts/{{post_id}})
+
+**Protected Blog Endpoints (require Authorization header):**
+
+- Create Post (POST {{base_url}}/api/blog/posts)
+- Update Post (PUT {{base_url}}/api/blog/posts/{{post_id}})
+- Delete Post (DELETE {{base_url}}/api/blog/posts/{{post_id}})
