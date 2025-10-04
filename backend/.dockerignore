@@ -1,0 +1,69 @@
+# Node modules
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build directory (will be copied separately)
+build
+
+# Development files
+*.md
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage
+*.lcov
+
+# Test files (not needed in production)
+tests
+*.spec.js
+*.spec.ts
+*.test.js
+*.test.ts
+
+# Documentation
+docs
+*.md
+
+# Temporary files
+tmp
+temp
+
+# Docker files
+Dockerfile
+.dockerignore
+docker-compose*.yml

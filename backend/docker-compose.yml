@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: blog-adonis-api
+    ports:
+      - '3333:3333'
+    environment:
+      - NODE_ENV=production
+      - APP_KEY=IggZFah7640RCn8f8mSN4BQCSFeihM-Z
+      - HOST=0.0.0.0
+      - PORT=3333
+      - DB_CONNECTION=sqlite
+      - DB_DATABASE=production
+      - TZ=UTC
+      - LOG_LEVEL=info
+    volumes:
+      - ./database:/app/database
+      - ./logs:/app/logs
+      - ./tmp:/app/tmp
+    restart: unless-stopped
