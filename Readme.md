@@ -44,4 +44,7 @@ cd frontend
 npm i
 npm run dev
 ```
+## API endpoint
+
+To view all API endpont read the document in ```backend/BLOG_IMPLEMENTATION_SUMMARY.md```
 
