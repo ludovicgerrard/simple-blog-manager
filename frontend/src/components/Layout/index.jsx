@@ -8,10 +8,8 @@ const Layout = ({ transitionStage, handleAnimation }) => {
     <>
       <Navbar />
       <Container
-        maxWidth="xl"
         sx={{
-          py: { xs: 14, sm: 16 },
-          px: { xs: 4, sm: 6 },
+          py: { xs: 3, sm: 4 },
         }}
         className={`${transitionStage}`}
         onAnimationEnd={handleAnimation}
