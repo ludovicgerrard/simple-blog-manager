@@ -1,0 +1,19 @@
+{
+  "name": "B3 App",
+  "short_name": "B3",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    }
+  ],
+  "theme_color": "#3B82F6",
+  "background_color": "#FFFFFF",
+  "display": "standalone"
+}
