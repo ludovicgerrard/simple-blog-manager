@@ -48,6 +48,11 @@ export default class AuthController {
         },
       })
     } catch (error) {
+      // Let validation errors bubble up for proper 422 response
+      if (error.code === 'E_VALIDATION_ERROR') {
+        throw error
+      }
+      
       return response.status(500).json({
         success: false,
         message: 'Registration failed',
@@ -169,6 +174,11 @@ export default class AuthController {
         },
       })
     } catch (error) {
+      // Let validation errors bubble up for proper 422 response
+      if (error.code === 'E_VALIDATION_ERROR') {
+        throw error
+      }
+      
       return response.status(500).json({
         success: false,
         message: 'Profile update failed',
@@ -203,6 +213,11 @@ export default class AuthController {
         message: 'Password changed successfully',
       })
     } catch (error) {
+      // Let validation errors bubble up for proper 422 response
+      if (error.code === 'E_VALIDATION_ERROR') {
+        throw error
+      }
+      
       return response.status(500).json({
         success: false,
         message: 'Password change failed',

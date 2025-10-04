@@ -93,6 +93,11 @@ export default class BlogController {
         },
       })
     } catch (error) {
+      // Let validation errors bubble up for proper 422 response
+      if (error.code === 'E_VALIDATION_ERROR') {
+        throw error
+      }
+      
       return response.status(500).json({
         success: false,
         message: 'Failed to create post',
@@ -142,6 +147,11 @@ export default class BlogController {
         },
       })
     } catch (error) {
+      // Let validation errors bubble up for proper 422 response
+      if (error.code === 'E_VALIDATION_ERROR') {
+        throw error
+      }
+      
       if (error.code === 'E_ROW_NOT_FOUND') {
         return response.status(404).json({
           success: false,
