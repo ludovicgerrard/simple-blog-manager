@@ -33,8 +33,8 @@ const RouteWay = () => {
     <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path="*" element={<NotFound />} />
-        {/* <Route path="/register" element={<Register />} /> */}
         <Route path="/auth-logged" element={<Redirection />} />
+        <Route path="/register" element={<Register />} />
 
         <Route
           element={

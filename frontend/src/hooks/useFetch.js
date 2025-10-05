@@ -71,10 +71,12 @@ const useFetch = (url, params = {}, type = "get") => {
         if (!axios.isCancel(err)) {
           dispatch({ type: "FETCH_ERROR", payload: err?.response?.data });
 
+          console.log(err?.response);
+
           let message =
-            typeof err?.response?.data === "string"
-              ? err?.response?.data
-              : JSON.stringify(err?.response?.data);
+            err?.response?.data?.message ||
+            "Error while loading data, please try again";
+
           toast.error(message, {
             autoClose: false,
           });
