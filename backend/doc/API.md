@@ -1,20 +1,6 @@
-# User Management & Blog API Testing Guide
+# 📡 **API Endpoints**
 
-This document shows how to test all the user management and blog endpoints that have been implemented.
-
-## Prerequisites
-
-1. Install dependencies: `npm install`
-2. Copy `.env.example` to `.env` (SQLite database is automatically created)
-3. Generate APP_KEY: `node ace generate:key` (if not already done)
-4. Run migrations: `node ace migration:run`
-5. Start the development server: `npm run dev`
-
-**Note:** This project uses SQLite database stored in `tmp/app.sqlite3`. No database server setup is required!
-
-## API Endpoints
-
-### Base URL
+## Base URL
 
 ```
 http://localhost:3333
@@ -54,7 +40,7 @@ curl -X POST http://localhost:3333/api/auth/register \
   }'
 ```
 
-Success Response (201):
+Success Response (200):
 
 ```json
 {
@@ -125,14 +111,6 @@ Error Response (401):
   "success": false,
   "message": "Invalid credentials"
 }
-```
-
-## Protected Endpoints (Require Authentication)
-
-For all protected endpoints, include the Authorization header:
-
-```
-Authorization: Bearer your-access-token-here
 ```
 
 ### 3. Get User Profile
@@ -242,87 +220,9 @@ Success Response (200):
 }
 ```
 
-## Validation Rules
-
-### Registration
-
-- `fullName`: Required, 2-100 characters
-- `email`: Required, valid email format, normalized
-- `password`: Required, 8-128 characters
-
-### Login
-
-- `email`: Required, valid email format
-- `password`: Required, minimum 1 character
-
-### Profile Update
-
-- `fullName`: Optional, 2-100 characters when provided
-
-### Password Change
-
-- `currentPassword`: Required
-- `newPassword`: Required, 8-128 characters
-
-## Error Responses
-
-### Validation Errors (422)
-
-```json
-{
-  "errors": [
-    {
-      "field": "email",
-      "rule": "email",
-      "message": "The email field must be a valid email"
-    }
-  ]
-}
-```
-
-### Unauthorized (401)
-
-```json
-{
-  "success": false,
-  "message": "Unauthorized"
-}
-```
-
-### Server Error (500)
-
-```json
-{
-  "success": false,
-  "message": "Error description",
-  "error": "Detailed error message"
-}
-```
-
-## Testing with Postman
-
-You can import these curl commands into Postman or create a collection with the following structure:
-
-1. **Environment Variables:**
-   - `base_url`: `http://localhost:3333`
-   - `token`: Set this after login/register
-
-2. **Collection Structure:**
-   - Health Check (GET {{base_url}}/)
-   - Auth/Register (POST {{base_url}}/api/auth/register)
-   - Auth/Login (POST {{base_url}}/api/auth/login)
-   - Auth/Profile (GET {{base_url}}/api/auth/profile)
-   - Auth/Update Profile (PUT {{base_url}}/api/auth/profile)
-   - Auth/Change Password (PUT {{base_url}}/api/auth/password)
-   - Auth/Logout (POST {{base_url}}/api/auth/logout)
-
-For protected endpoints, add Authorization header with value: `Bearer {{token}}`
-
 ## Blog API Endpoints
 
-### Public Blog Routes (No Authentication)
-
-#### 1. List All Posts
+### 1. List All Posts
 
 **GET** `/api/blog/posts`
 
@@ -368,7 +268,7 @@ Success Response (200):
 }
 ```
 
-#### 2. View Single Post
+### 2. View Single Post
 
 **GET** `/api/blog/posts/:id`
 
@@ -408,9 +308,7 @@ Error Response (404):
 }
 ```
 
-### Protected Blog Routes (Authentication Required)
-
-#### 3. Create New Post
+### 3. Create New Post
 
 **POST** `/api/blog/posts`
 
@@ -448,7 +346,7 @@ Success Response (201):
 }
 ```
 
-#### 4. Update Post (Author Only)
+### 4. Update Post (Author Only)
 
 **PUT** `/api/blog/posts/:id`
 
@@ -495,7 +393,7 @@ Error Response (403 - Not the author):
 }
 ```
 
-#### 5. Delete Post (Author Only)
+### 5. Delete Post (Author Only)
 
 **DELETE** `/api/blog/posts/:id`
 
@@ -521,34 +419,3 @@ Error Response (403 - Not the author):
   "message": "You can only delete your own posts"
 }
 ```
-
-## Blog Validation Rules
-
-### Creating/Updating Posts
-
-- `title`: Required (when creating), 1-255 characters, automatically trimmed
-- `content`: Required (when creating), 1-10000 characters, automatically trimmed
-- Author is automatically set to the authenticated user
-- Both fields are secured against SQL injection through ORM and validation
-
-### Security Features
-
-- **Input Sanitization**: All inputs are trimmed and validated
-- **SQL Injection Prevention**: Uses Lucid ORM with parameterized queries
-- **Authorization**: Users can only edit/delete their own posts
-- **Content Length Limits**: Prevents excessive content submission
-
-## Extended Postman Collection
-
-Add these endpoints to your Postman collection:
-
-**Public Blog Endpoints:**
-
-- List Posts (GET {{base_url}}/api/blog/posts)
-- View Post (GET {{base_url}}/api/blog/posts/{{post_id}})
-
-**Protected Blog Endpoints (require Authorization header):**
-
-- Create Post (POST {{base_url}}/api/blog/posts)
-- Update Post (PUT {{base_url}}/api/blog/posts/{{post_id}})
-- Delete Post (DELETE {{base_url}}/api/blog/posts/{{post_id}})

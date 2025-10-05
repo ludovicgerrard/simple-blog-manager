@@ -2,7 +2,7 @@
 
 ## Description
 
-This is an simple blog manager. User must login to create post. Blogs wan be viewed by anyone 
+This is a simple blog manager. User must login to create post. Blogs wan be viewed by anyone 
 
 ## Tech used
 
@@ -19,6 +19,8 @@ root/
 
 ## Run backend 
 
+### In Docker
+
 To run the backend, run this command in terminal assuming that docker is already installed
 
 ```
@@ -26,7 +28,9 @@ cd backend
 docker compose up -d
 ```
 
-### Run backend on dev mode
+### On dev mode
+
+Need node version 20 installed
 
 ```
 cd backend
@@ -46,5 +50,5 @@ npm run dev
 ```
 ## API endpoint
 
-To view all API endpont read the document in ```backend/BLOG_IMPLEMENTATION_SUMMARY.md```
+To view all API endpont read the document in ```backend/doc/API.md```
 
