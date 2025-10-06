@@ -24,17 +24,20 @@ function AddUpdatePost() {
   let id =
     location.pathname.split("/")[location.pathname.split("/").length - 1];
 
-  const [formErrors, setFormErrors] = useState(undefined);
   const formRef = useRef(null);
+  const nameRef = useRef(null);
+  const contentRef = useRef(null);
+
+  const [formErrors, setFormErrors] = useState(undefined);
   const [post, postApi, cancelPostApi] = useFetch("/api/blog/posts");
   const [postGet, getPost, cancelPostGet] = useFetch(`/api/blog/posts/${id}`);
 
-  const [state, formAction, isPending] = useActionState(addPostAction, {
+  const [state, formAction, isPending] = useActionState(addOrUpdatePostAction, {
     message: "",
     error: false,
   });
 
-  async function addPostAction(prevState, formData) {
+  async function addOrUpdatePostAction(prevState, formData) {
     setFormErrors(undefined);
 
     const errors = validate(formData);
@@ -44,14 +47,41 @@ function AddUpdatePost() {
       return;
     }
 
-    const response = await postApi(formData, "post");
+    let type = id ? "put" : "post";
+
+    const response = await postApi(
+      formData,
+      type,
+      "json",
+      false,
+      false,
+      `${id ? `/${id}` : ""}`
+    );
+
     if (!response.success) {
-      toast.error("Failed to add post! " + response.message || "");
+      toast.error(
+        `"Failed to ${id ? "update" : "add"} post! "` + response.message || ""
+      );
     } else {
-      toast.success("Post added successfully!");
-      // navigate("/");
+      toast.success(`Post ${id ? "updated" : "added"} successfully!`);
+      navigate("/");
     }
   }
+
+  const getPostDetails = () => {
+    if (location.pathname.split("/").length <= 2) return;
+
+    getPost().then((resp) => {
+      if (nameRef.current) {
+        nameRef.current.querySelector("input[name='title']").value =
+          resp.data.post.title;
+      }
+      if (contentRef.current) {
+        contentRef.current.querySelector("textarea[name='content']").value =
+          resp.data.post.content;
+      }
+    });
+  };
 
   useEffect(() => {
     function watchReset(e) {
@@ -59,6 +89,8 @@ function AddUpdatePost() {
     }
     const form = formRef.current;
     form?.addEventListener("reset", watchReset);
+
+    getPostDetails();
 
     return () => {
       form?.removeEventListener("reset", watchReset);
@@ -71,21 +103,26 @@ function AddUpdatePost() {
       <BarAction />
       <Container maxWidth="sm" sx={{ pt: 4 }}>
         <Typography level="h2" sx={{ fontSize: "xl", mb: 0.5 }}>
-          Add Post
+          {id ? "Update" : "Add"} Post
         </Typography>
 
         <form action={formAction} ref={formRef}>
           <Box sx={{ py: 1 }}>
             <FormControl>
               <FormLabel>Title</FormLabel>
-              <Input placeholder="Title" name="title" />
+              <Input placeholder="Title" name="title" ref={nameRef} />
             </FormControl>
           </Box>
 
           <Box sx={{ py: 1 }}>
             <FormControl>
               <FormLabel>Content</FormLabel>
-              <Textarea placeholder="Content" minRows={6} name="content" />
+              <Textarea
+                placeholder="Content"
+                minRows={6}
+                name="content"
+                ref={contentRef}
+              />
             </FormControl>
           </Box>
 
