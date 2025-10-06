@@ -11,6 +11,8 @@ import PageLoader from "@/components/PageLoader";
 const Blogs = lazy(() => import("@/pages/Blogs"));
 const Register = lazy(() => import("@/pages/User/Register"));
 const Redirection = lazy(() => import("@/components/Redirection"));
+const Post = lazy(() => import("@/pages/Post"));
+const AddUpdatePost = lazy(() => import("@/pages/Post/AddUpdatePost"));
 
 const RouteWay = () => {
   const location = useLocation();
@@ -45,26 +47,20 @@ const RouteWay = () => {
           }
         >
           <Route path="/" index element={<Blogs />} />
-
-          {/* <Route
-            path="/who"
-            element={
-              <RequireAuth>
-                <MyWho />
-              </RequireAuth>
-            }
-          />
-
-          <Route path="/who">
-            <Route
-              path=":id"
-              element={
-                <RequireAuth>
-                  <Who />
-                </RequireAuth>
-              }
-            />
-          </Route> */}
+          <Route path="/post">
+            <Route path=":id" element={<Post />} />
+          </Route>
+        </Route>
+        <Route
+          path="/add-post"
+          element={
+            <RequireAuth>
+              <AddUpdatePost />
+            </RequireAuth>
+          }
+        />
+        <Route path="/update-post">
+          <Route path=":id" element={<AddUpdatePost />} />
         </Route>
       </Routes>
     </Suspense>

@@ -9,13 +9,18 @@ const NotFound = () => {
 
   return (
     <Container
-      maxWidth="xl"
+      maxWidth="md"
       sx={{
-        py: { xs: 14, sm: 4 },
+        py: 1,
         px: { xs: 4, sm: 4 },
       }}
     >
-      <Button startDecorator="←" onClick={() => navigate("/")}>
+      <Button
+        size="sm"
+        variant="plain"
+        startDecorator="←"
+        onClick={() => navigate("/")}
+      >
         Return
       </Button>
       <div className="page_404">Page non trouvée</div>
