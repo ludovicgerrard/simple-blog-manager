@@ -17,7 +17,7 @@ import logo from "@/assets/img/logo.svg";
 
 function Navbar() {
   return (
-    <Container sx={{ py: 1 }}>
+    <Container sx={{ py: 1, mb: 2 }}>
       <Stack
         direction="row"
         spacing={2}

@@ -8,9 +8,6 @@ const Layout = ({ transitionStage, handleAnimation }) => {
     <>
       <Navbar />
       <Container
-        sx={{
-          py: { xs: 3, sm: 4 },
-        }}
         className={`${transitionStage}`}
         onAnimationEnd={handleAnimation}
       >
