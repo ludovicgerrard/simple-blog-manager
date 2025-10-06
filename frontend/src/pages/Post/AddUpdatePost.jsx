@@ -60,9 +60,6 @@ function AddUpdatePost() {
     const form = formRef.current;
     form?.addEventListener("reset", watchReset);
 
-    if (id) {
-      console.log(id);
-    }
     return () => {
       form?.removeEventListener("reset", watchReset);
       cancelPostGet.cancel();

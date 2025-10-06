@@ -1,4 +1,4 @@
-import { useActionState, useContext, useState } from "react";
+import { useActionState, useContext, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Container } from "@mui/material";
@@ -18,6 +18,8 @@ import { toast } from "react-toastify";
 function Register() {
   const navigate = useNavigate();
   let { signin, addUserInfo } = useContext(AuthContext);
+  const formRef = useRef(null);
+
   const [auth, authApi, cancelAuthApi] = useFetch("/api/auth/register");
 
   const initialState = { message: "", error: false };
@@ -44,11 +46,24 @@ function Register() {
       }
 
       toast.success("Registration successful!");
-      signin(resp.data.token.value);
+      await signin(resp.data.token.value);
+      await addUserInfo(resp.data.user);
 
       await new Promise((res) => setTimeout(res, 2000));
       navigate("/");
     });
+
+    useEffect(() => {
+      function watchReset(e) {
+        e.preventDefault();
+      }
+      const form = formRef.current;
+      form?.addEventListener("reset", watchReset);
+
+      return () => {
+        form?.removeEventListener("reset", watchReset);
+      };
+    }, []);
   }
 
   return (
@@ -59,7 +74,7 @@ function Register() {
           Register
         </Typography>
 
-        <form action={formAction}>
+        <form action={formAction} ref={formRef}>
           <Box sx={{ py: 1 }}>
             <FormControl>
               <FormLabel>Fullname</FormLabel>

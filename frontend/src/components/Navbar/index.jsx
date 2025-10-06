@@ -106,6 +106,7 @@ function LoginMenu() {
       }
 
       await signin(resp.data.token.value);
+      await addUserInfo(resp.data.user);
 
       setOpen(false);
     });

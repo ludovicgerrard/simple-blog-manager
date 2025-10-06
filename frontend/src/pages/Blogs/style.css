@@ -5,3 +5,11 @@
   mask-image: linear-gradient(180deg, #000 80%, transparent);
   -webkit-mask-image: linear-gradient(180deg, #000 80%, transparent);
 }
+
+.long-text {
+  flex: 1; /* allow it to shrink with container */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0; /* 🔥 crucial for flexbox children */
+}

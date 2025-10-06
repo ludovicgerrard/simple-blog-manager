@@ -60,7 +60,14 @@ const RouteWay = () => {
           }
         />
         <Route path="/update-post">
-          <Route path=":id" element={<AddUpdatePost />} />
+          <Route
+            path=":id"
+            element={
+              <RequireAuth>
+                <AddUpdatePost />
+              </RequireAuth>
+            }
+          />
         </Route>
       </Routes>
     </Suspense>
