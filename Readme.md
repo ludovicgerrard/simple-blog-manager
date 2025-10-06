@@ -6,6 +6,8 @@ This is a simple blog manager. User must login to create post. Blogs wan be view
 
 ## Run backend 
 
+Node version min 22.20.0
+
 ### In Docker
 
 To run the backend, run this command in terminal assuming that docker is already installed
@@ -18,11 +20,12 @@ docker compose up -d
 ### On dev mode
 
 Need node version 20 installed
+Copy/paste .env.exmaple → .env
 
 ```
 cd backend
 npm i
-npm start
+npm run dev
 ```
 
 
