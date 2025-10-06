@@ -1,28 +1,20 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import Post from '#models/post'
 import { createPostValidator, updatePostValidator } from '#validators/blog'
+import BlogService from '#services/blog_service'
+import PostRepository from '#repositories/post_repository'
 
 export default class BlogController {
-  /**
-   * List all blog posts with pagination
-   */
+  private blogService = new BlogService(new PostRepository())
+
   async index({ request, response }: HttpContext) {
     try {
       const page = request.input('page', 1)
       const limit = request.input('limit', 10)
-
-      const posts = await Post.query()
-        .preload('author', (query) => {
-          query.select(['id', 'fullName', 'email'])
-        })
-        .orderBy('createdAt', 'desc')
-        .paginate(page, limit)
+      const posts = await this.blogService.list(page, limit)
 
       return response.json({
         success: true,
-        data: {
-          posts: posts.serialize(),
-        },
+        data: { posts: posts.serialize() },
       })
     } catch (error) {
       return response.status(500).json({
@@ -33,71 +25,34 @@ export default class BlogController {
     }
   }
 
-  /**
-   * View a specific blog post
-   */
   async show({ params, response }: HttpContext) {
     try {
-      const post = await Post.query()
-        .where('id', params.id)
-        .preload('author', (query) => {
-          query.select(['id', 'fullName', 'email'])
-        })
-        .firstOrFail()
-
+      const post = await this.blogService.find(params.id)
       return response.json({
         success: true,
-        data: {
-          post: post.serialize(),
-        },
+        data: { post: post.serialize() },
       })
     } catch (error) {
-      if (error.code === 'E_ROW_NOT_FOUND') {
-        return response.status(404).json({
-          success: false,
-          message: 'Post not found',
-        })
-      }
-      return response.status(500).json({
+      return response.status(error.code === 'E_ROW_NOT_FOUND' ? 404 : 500).json({
         success: false,
-        message: 'Failed to fetch post',
+        message: error.code === 'E_ROW_NOT_FOUND' ? 'Post not found' : 'Failed to fetch post',
         error: error.message,
       })
     }
   }
 
-  /**
-   * Create a new blog post
-   */
   async store({ request, response, auth }: HttpContext) {
+    const user = await auth.getUserOrFail()
+    const payload = await request.validateUsing(createPostValidator)
+
     try {
-      const user = auth.getUserOrFail()
-      const payload = await request.validateUsing(createPostValidator)
-
-      const post = await Post.create({
-        title: payload.title,
-        content: payload.content,
-        authorId: user.id,
-      })
-
-      // Load the author relationship
-      await post.load('author', (query) => {
-        query.select(['id', 'fullName', 'email'])
-      })
-
+      const post = await this.blogService.create(payload, user.id)
       return response.status(201).json({
         success: true,
         message: 'Post created successfully',
-        data: {
-          post: post.serialize(),
-        },
+        data: { post: post.serialize() },
       })
     } catch (error) {
-      // Let validation errors bubble up for proper 422 response
-      if (error.code === 'E_VALIDATION_ERROR') {
-        throw error
-      }
-      
       return response.status(500).json({
         success: false,
         message: 'Failed to create post',
@@ -106,59 +61,25 @@ export default class BlogController {
     }
   }
 
-  /**
-   * Update a blog post (only by the author)
-   */
   async update({ params, request, response, auth }: HttpContext) {
+    const user = await auth.getUserOrFail()
+    const payload = await request.validateUsing(updatePostValidator)
+
     try {
-      const user = auth.getUserOrFail()
-      const payload = await request.validateUsing(updatePostValidator)
-
-      const post = await Post.findOrFail(params.id)
-
-      // Check if user is the author
-      if (post.authorId !== user.id) {
+      const post = await this.blogService.update(params.id, user.id, payload)
+      return response.json({
+        success: true,
+        message: 'Post updated successfully',
+        data: { post: post.serialize() },
+      })
+    } catch (error) {
+      if (error.message === 'UNAUTHORIZED') {
         return response.status(403).json({
           success: false,
           message: 'You can only edit your own posts',
         })
       }
-
-      // Update only provided fields
-      if (payload.title !== undefined) {
-        post.title = payload.title
-      }
-      if (payload.content !== undefined) {
-        post.content = payload.content
-      }
-
-      await post.save()
-
-      // Load the author relationship
-      await post.load('author', (query) => {
-        query.select(['id', 'fullName', 'email'])
-      })
-
-      return response.json({
-        success: true,
-        message: 'Post updated successfully',
-        data: {
-          post: post.serialize(),
-        },
-      })
-    } catch (error) {
-      // Let validation errors bubble up for proper 422 response
-      if (error.code === 'E_VALIDATION_ERROR') {
-        throw error
-      }
-      
-      if (error.code === 'E_ROW_NOT_FOUND') {
-        return response.status(404).json({
-          success: false,
-          message: 'Post not found',
-        })
-      }
-      return response.status(500).json({
+      return response.status(error.code === 'E_ROW_NOT_FOUND' ? 404 : 500).json({
         success: false,
         message: 'Failed to update post',
         error: error.message,
@@ -166,36 +87,23 @@ export default class BlogController {
     }
   }
 
-  /**
-   * Delete a blog post (only by the author)
-   */
   async destroy({ params, response, auth }: HttpContext) {
+    const user = await auth.getUserOrFail()
+
     try {
-      const user = auth.getUserOrFail()
-      const post = await Post.findOrFail(params.id)
-
-      // Check if user is the author
-      if (post.authorId !== user.id) {
-        return response.status(403).json({
-          success: false,
-          message: 'You can only delete your own posts',
-        })
-      }
-
-      await post.delete()
-
+      await this.blogService.delete(params.id, user.id)
       return response.json({
         success: true,
         message: 'Post deleted successfully',
       })
     } catch (error) {
-      if (error.code === 'E_ROW_NOT_FOUND') {
-        return response.status(404).json({
+      if (error.message === 'UNAUTHORIZED') {
+        return response.status(403).json({
           success: false,
-          message: 'Post not found',
+          message: 'You can only delete your own posts',
         })
       }
-      return response.status(500).json({
+      return response.status(error.code === 'E_ROW_NOT_FOUND' ? 404 : 500).json({
         success: false,
         message: 'Failed to delete post',
         error: error.message,

@@ -5,8 +5,8 @@ import testUtils from '@adonisjs/core/services/test_utils'
 test.group('Auth API', (group) => {
   group.each.setup(() => testUtils.db().truncate())
 
-  test('POST /api/auth/register - creates new user and returns token', async ({ client }) => {
-    const response = await client.post('/api/auth/register').json({
+  test('POST /api/register - creates new user and returns token', async ({ client }) => {
+    const response = await client.post('/api/register').json({
       fullName: 'John Doe',
       email: 'john@example.com',
       password: 'password123',
@@ -33,7 +33,7 @@ test.group('Auth API', (group) => {
     response.assert?.equal(user?.fullName, 'John Doe')
   })
 
-  test('POST /api/auth/register - rejects duplicate email', async ({ client }) => {
+  test('POST /api/register - rejects duplicate email', async ({ client }) => {
     // Create first user
     await User.create({
       fullName: 'First User',
@@ -42,7 +42,7 @@ test.group('Auth API', (group) => {
     })
 
     // Try to create second user with same email
-    const response = await client.post('/api/auth/register').json({
+    const response = await client.post('/api/register').json({
       fullName: 'Second User',
       email: 'duplicate@example.com',
       password: 'password456',
@@ -55,8 +55,8 @@ test.group('Auth API', (group) => {
     })
   })
 
-  test('POST /api/auth/register - validates input', async ({ client }) => {
-    const response = await client.post('/api/auth/register').json({
+  test('POST /api/register - validates input', async ({ client }) => {
+    const response = await client.post('/api/register').json({
       fullName: 'J', // Too short
       email: 'invalid-email', // Invalid format
       password: 'short', // Too short
@@ -65,7 +65,7 @@ test.group('Auth API', (group) => {
     response.assertStatus(422)
   })
 
-  test('POST /api/auth/login - authenticates user and returns token', async ({ client }) => {
+  test('POST /api/login - authenticates user and returns token', async ({ client }) => {
     // Create a user first
     const user = await User.create({
       fullName: 'Test User',
@@ -73,7 +73,7 @@ test.group('Auth API', (group) => {
       password: 'password123',
     })
 
-    const response = await client.post('/api/auth/login').json({
+    const response = await client.post('/api/login').json({
       email: 'test@example.com',
       password: 'password123',
     })
@@ -95,14 +95,14 @@ test.group('Auth API', (group) => {
     })
   })
 
-  test('POST /api/auth/login - rejects invalid credentials', async ({ client }) => {
+  test('POST /api/login - rejects invalid credentials', async ({ client }) => {
     await User.create({
       fullName: 'Test User',
       email: 'test@example.com',
       password: 'password123',
     })
 
-    const response = await client.post('/api/auth/login').json({
+    const response = await client.post('/api/login').json({
       email: 'test@example.com',
       password: 'wrong-password',
     })
@@ -114,7 +114,7 @@ test.group('Auth API', (group) => {
     })
   })
 
-  test('GET /api/auth/profile - returns user profile when authenticated', async ({ client }) => {
+  test('GET /api/profile - returns user profile when authenticated', async ({ client }) => {
     const user = await User.create({
       fullName: 'Profile User',
       email: 'profile@example.com',
@@ -124,7 +124,7 @@ test.group('Auth API', (group) => {
     const token = await User.accessTokens.create(user)
 
     const response = await client
-      .get('/api/auth/profile')
+      .get('/api/profile')
       .header('Authorization', `Bearer ${token.value!.release()}`)
 
     response.assertStatus(200)
@@ -140,45 +140,13 @@ test.group('Auth API', (group) => {
     })
   })
 
-  test('GET /api/auth/profile - rejects unauthenticated request', async ({ client }) => {
-    const response = await client.get('/api/auth/profile')
+  test('GET /api/profile - rejects unauthenticated request', async ({ client }) => {
+    const response = await client.get('/api/profile')
 
     response.assertStatus(401)
   })
 
-  test('PUT /api/auth/profile - updates user profile', async ({ client }) => {
-    const user = await User.create({
-      fullName: 'Original Name',
-      email: 'update@example.com',
-      password: 'password123',
-    })
-
-    const token = await User.accessTokens.create(user)
-
-    const response = await client
-      .put('/api/auth/profile')
-      .header('Authorization', `Bearer ${token.value!.release()}`)
-      .json({
-        fullName: 'Updated Name',
-      })
-
-    response.assertStatus(200)
-    response.assertBodyContains({
-      success: true,
-      message: 'Profile updated successfully',
-      data: {
-        user: {
-          fullName: 'Updated Name',
-        },
-      },
-    })
-
-    // Verify update in database
-    await user.refresh()
-    response.assert?.equal(user.fullName, 'Updated Name')
-  })
-
-  test('PUT /api/auth/password - changes user password', async ({ client }) => {
+  test('PUT /api/password - changes user password', async ({ client }) => {
     const user = await User.create({
       fullName: 'Password User',
       email: 'password@example.com',
@@ -188,7 +156,7 @@ test.group('Auth API', (group) => {
     const token = await User.accessTokens.create(user)
 
     const response = await client
-      .put('/api/auth/password')
+      .put('/api/password')
       .header('Authorization', `Bearer ${token.value!.release()}`)
       .json({
         currentPassword: 'old-password',
@@ -202,7 +170,7 @@ test.group('Auth API', (group) => {
     })
   })
 
-  test('PUT /api/auth/password - rejects wrong current password', async ({ client }) => {
+  test('PUT /api/password - rejects wrong current password', async ({ client }) => {
     const user = await User.create({
       fullName: 'Password User',
       email: 'password2@example.com',
@@ -212,7 +180,7 @@ test.group('Auth API', (group) => {
     const token = await User.accessTokens.create(user)
 
     const response = await client
-      .put('/api/auth/password')
+      .put('/api/password')
       .header('Authorization', `Bearer ${token.value!.release()}`)
       .json({
         currentPassword: 'wrong-password',
@@ -226,7 +194,7 @@ test.group('Auth API', (group) => {
     })
   })
 
-  test('POST /api/auth/logout - logs out user', async ({ client }) => {
+  test('POST /api/logout - logs out user', async ({ client }) => {
     const user = await User.create({
       fullName: 'Logout User',
       email: 'logout@example.com',
@@ -236,7 +204,7 @@ test.group('Auth API', (group) => {
     const token = await User.accessTokens.create(user)
 
     const response = await client
-      .post('/api/auth/logout')
+      .post('/api/logout')
       .header('Authorization', `Bearer ${token.value!.release()}`)
 
     response.assertStatus(200)

@@ -10,6 +10,7 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 const AuthController = () => import('#controllers/auth_controller')
+const UserController = () => import('#controllers/user_controller')
 const BlogController = () => import('#controllers/blog_controller')
 
 // Health check endpoint
@@ -24,36 +25,35 @@ router.get('/', async () => {
 // Public auth routes (no authentication required)
 router
   .group(() => {
-    router.post('/register', [AuthController, 'register'])
     router.post('/login', [AuthController, 'login'])
+    router.post('/register', [UserController, 'register'])
   })
-  .prefix('/api/auth')
+  .prefix('/api')
 
 // Protected auth routes (authentication required)
 router
   .group(() => {
     router.post('/logout', [AuthController, 'logout'])
-    router.get('/profile', [AuthController, 'profile'])
-    router.put('/profile', [AuthController, 'updateProfile'])
-    router.put('/password', [AuthController, 'changePassword'])
+    router.get('/profile', [UserController, 'profile'])
+    router.put('/password', [UserController, 'changePassword'])
   })
-  .prefix('/api/auth')
+  .prefix('/api')
   .middleware(middleware.auth())
 
 // Public blog routes (reading posts)
 router
   .group(() => {
-    router.get('/posts', [BlogController, 'index']) // List all posts
-    router.get('/posts/:id', [BlogController, 'show']) // View single post
+    router.get('/', [BlogController, 'index']) // List all posts
+    router.get('/:id', [BlogController, 'show']) // View single post
   })
-  .prefix('/api/blog')
+  .prefix('/api/posts')
 
 // Protected blog routes (authentication required for write operations)
 router
   .group(() => {
-    router.post('/posts', [BlogController, 'store']) // Create new post
-    router.put('/posts/:id', [BlogController, 'update']) // Update post (author only)
-    router.delete('/posts/:id', [BlogController, 'destroy']) // Delete post (author only)
+    router.post('/', [BlogController, 'store']) // Create new post
+    router.put('/:id', [BlogController, 'update']) // Update post (author only)
+    router.delete('/:id', [BlogController, 'destroy']) // Delete post (author only)
   })
-  .prefix('/api/blog')
+  .prefix('/api/posts')
   .middleware(middleware.auth())

@@ -22,15 +22,6 @@ export const loginValidator = vine.compile(
 )
 
 /**
- * Validator for updating user profile
- */
-export const updateProfileValidator = vine.compile(
-  vine.object({
-    fullName: vine.string().trim().minLength(2).maxLength(100).optional(),
-  })
-)
-
-/**
  * Validator for changing password
  */
 export const changePasswordValidator = vine.compile(

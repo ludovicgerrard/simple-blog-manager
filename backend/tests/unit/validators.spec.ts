@@ -2,7 +2,6 @@ import { test } from '@japa/runner'
 import {
   registerValidator,
   loginValidator,
-  updateProfileValidator,
   changePasswordValidator,
 } from '#validators/auth'
 
@@ -113,30 +112,6 @@ test.group('loginValidator', () => {
       'password'
     )
     assert.isTrue(!!failedOnPassword)
-  })
-})
-
-/**
- * updateProfileValidator
- */
-
-test.group('updateProfileValidator', () => {
-  test('allows empty payload (no updates)', async ({ assert }) => {
-    const output = await updateProfileValidator.validate({})
-    assert.isUndefined((output as any).fullName)
-  })
-
-  test('rejects provided fullName that is too short', async ({ assert }) => {
-    const failed = await expectValidationError(
-      updateProfileValidator.validate({ fullName: 'A' }),
-      'fullName'
-    )
-    assert.isTrue(!!failed)
-  })
-
-  test('accepts provided fullName when valid', async ({ assert }) => {
-    const output = await updateProfileValidator.validate({ fullName: 'Jane Doe' })
-    assert.equal(output.fullName, 'Jane Doe')
   })
 })
 
