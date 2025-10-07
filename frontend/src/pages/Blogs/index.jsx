@@ -38,24 +38,6 @@ function Blogs() {
     };
   }, []);
 
-  if (allPosts.length === 0) {
-    return (
-      <>
-        {isAuth && (
-          <Stack direction="row" spacing={1}>
-            <Button size="sm" onClick={goAddPost}>
-              Add Post
-            </Button>
-          </Stack>
-        )}
-        <Card>
-          <Typography level="h3">No posts available</Typography>
-          <Typography level="body-md">Register & add post</Typography>
-        </Card>
-      </>
-    );
-  }
-
   return (
     <>
       {isAuth && (
@@ -65,11 +47,18 @@ function Blogs() {
           </Button>
         </Stack>
       )}
-      <Grid container spacing={2}>
-        {allPosts.map((details, key) => (
-          <Post key={key} details={details} getPosts={getPosts} />
-        ))}
-      </Grid>
+      {allPosts.length === 0 ? (
+        <Card>
+          <Typography level="h3">No posts available</Typography>
+          <Typography level="body-md">Register & add post</Typography>
+        </Card>
+      ) : (
+        <Grid container spacing={2}>
+          {allPosts.map((details, key) => (
+            <Post key={key} details={details} getPosts={getPosts} />
+          ))}
+        </Grid>
+      )}
     </>
   );
 }
