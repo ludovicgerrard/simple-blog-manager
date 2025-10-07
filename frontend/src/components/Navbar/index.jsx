@@ -6,14 +6,17 @@ import MenuButton from "@mui/joy/MenuButton";
 import Dropdown from "@mui/joy/Dropdown";
 import { Container } from "@mui/material";
 import Input from "@mui/joy/Input";
+import Avatar from "@mui/joy/Avatar";
 
-import { Box, Button, Typography, Stack } from "@mui/joy";
+import { Box, Button, Typography, Stack, MenuItem } from "@mui/joy";
 
 import { AuthContext } from "@/services/authService";
 import useFetch from "@/hooks/useFetch";
 import { toast } from "react-toastify";
 
 import logo from "@/assets/img/logo.svg";
+
+import "./style.css";
 
 function Navbar() {
   return (
@@ -41,8 +44,8 @@ function Navbar() {
 function AuthMenu() {
   const navigate = useNavigate();
 
-  let { isAuth, signout } = useContext(AuthContext);
-  const [auth, authLogoutApi, cancelAuthApi] = useFetch("/api/auth/logout");
+  let { isAuth, signout, userInfo } = useContext(AuthContext);
+  const [auth, authLogoutApi, cancelAuthApi] = useFetch("/api/logout");
 
   const goRegister = () => navigate("/register");
 
@@ -57,17 +60,25 @@ function AuthMenu() {
     });
   };
 
-  const goAddPost = () => navigate("/add-post");
-
   if (isAuth) {
     return (
       <>
-        <Button size="sm" onClick={goAddPost}>
-          Add Post
-        </Button>
-        <Button size="sm" onClick={logout} variant="outlined">
-          Logout
-        </Button>
+        <Dropdown>
+          <MenuButton
+            size="sm"
+            variant="outlined"
+            /* startDecorator={
+              <Avatar size="sm" variant="solid">
+                {userInfo.fullName.charAt(0)}
+              </Avatar>
+            } */
+          >
+            <span className="limit-width">{userInfo.fullName}</span>
+          </MenuButton>
+          <Menu placement="bottom-end" size="sm">
+            <MenuItem onClick={logout}>Logout</MenuItem>
+          </Menu>
+        </Dropdown>
       </>
     );
   }
@@ -88,7 +99,7 @@ function LoginMenu() {
     setOpen(isOpen);
   }, []);
 
-  const [auth, authApi, cancelAuthApi] = useFetch("/api/auth/login");
+  const [auth, authApi, cancelAuthApi] = useFetch("/api/login");
   let { signin, addUserInfo } = useContext(AuthContext);
 
   const [formErrors, setFormErrors] = useState(undefined);
@@ -99,17 +110,16 @@ function LoginMenu() {
 
   async function signInAction(prevState, formData) {
     setFormErrors(undefined);
-    authApi(formData, "post").then(async (resp) => {
-      if (!resp.success) {
-        toast.error("Login failed!");
-        return;
-      }
+    let response = await authApi(formData, "post");
+    if (!response.success) {
+      toast.error("Login failed!");
+      return;
+    }
 
-      await signin(resp.data.token.value);
-      await addUserInfo(resp.data.user);
+    await signin(response.data.token.value);
+    await addUserInfo(response.data.user);
 
-      setOpen(false);
-    });
+    setOpen(false);
   }
 
   return (
@@ -128,6 +138,10 @@ function LoginMenu() {
               px: 1,
             }}
           >
+            <Typography level="title-md" sx={{ pt: 2 }}>
+              Login with your mail
+            </Typography>
+
             <Input placeholder="email" name="email" type="email" />
 
             <Input type="password" name="password" />

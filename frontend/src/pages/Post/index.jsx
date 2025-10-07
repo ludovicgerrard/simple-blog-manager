@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
 import { Container } from "@mui/material";
 import { Box, Typography, Card } from "@mui/joy";
@@ -9,11 +9,9 @@ import BarAction from "@/components/BarAction";
 import useFetch from "@/hooks/useFetch";
 
 function Post() {
-  let location = useLocation();
-  let id =
-    location.pathname.split("/")[location.pathname.split("/").length - 1];
+  let { id } = useParams();
 
-  const [post, getPost, cancelPost] = useFetch(`/api/blog/posts/${id}`);
+  const [post, getPost, cancelPost] = useFetch(`/api/posts/${id}`);
   const [postDetails, setPostDetails] = useState({});
 
   useEffect(() => {

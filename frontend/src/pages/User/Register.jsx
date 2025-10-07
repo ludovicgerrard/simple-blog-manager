@@ -20,7 +20,7 @@ function Register() {
   let { signin, addUserInfo } = useContext(AuthContext);
   const formRef = useRef(null);
 
-  const [auth, authApi, cancelAuthApi] = useFetch("/api/auth/register");
+  const [auth, authApi, cancelAuthApi] = useFetch("/api/register");
 
   const initialState = { message: "", error: false };
   const [formErrors, setFormErrors] = useState(undefined);
@@ -53,17 +53,18 @@ function Register() {
       navigate("/");
     });
 
-    useEffect(() => {
-      function watchReset(e) {
-        e.preventDefault();
-      }
+    /* function watchReset(e) {
+      e.preventDefault();
+    } */
+
+    /* useEffect(() => {
       const form = formRef.current;
       form?.addEventListener("reset", watchReset);
 
       return () => {
         form?.removeEventListener("reset", watchReset);
       };
-    }, []);
+    }, []); */
   }
 
   return (

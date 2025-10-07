@@ -11,15 +11,19 @@ import {
   Stack,
 } from "@mui/joy";
 
+import { AuthContext } from "@/services/authService";
 import useFetch from "@/hooks/useFetch";
 import MoreOptions from "./MoreOptions";
 
 import "./style.css";
 
 function Blogs() {
-  const [posts, postsApi, cancelPostsApi] = useFetch("/api/blog/posts");
+  let { isAuth } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const [posts, postsApi, cancelPostsApi] = useFetch("/api/posts");
   const [allPosts, setAllPosts] = useState([]);
 
+  const goAddPost = () => navigate("/add-post");
   const getPosts = async () => {
     postsApi().then((resp) => {
       setAllPosts(resp?.data?.posts?.data || []);
@@ -34,12 +38,39 @@ function Blogs() {
     };
   }, []);
 
+  if (allPosts.length === 0) {
+    return (
+      <>
+        {isAuth && (
+          <Stack direction="row" spacing={1}>
+            <Button size="sm" onClick={goAddPost}>
+              Add Post
+            </Button>
+          </Stack>
+        )}
+        <Card>
+          <Typography level="h3">No posts available</Typography>
+          <Typography level="body-md">Register & add post</Typography>
+        </Card>
+      </>
+    );
+  }
+
   return (
-    <Grid container spacing={2}>
-      {allPosts.map((details, key) => (
-        <Post key={key} details={details} getPosts={getPosts} />
-      ))}
-    </Grid>
+    <>
+      {isAuth && (
+        <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+          <Button size="sm" onClick={goAddPost}>
+            Add Post
+          </Button>
+        </Stack>
+      )}
+      <Grid container spacing={2}>
+        {allPosts.map((details, key) => (
+          <Post key={key} details={details} getPosts={getPosts} />
+        ))}
+      </Grid>
+    </>
   );
 }
 

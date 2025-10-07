@@ -1,5 +1,5 @@
 import { useActionState, useState, useRef, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 
 import { Container } from "@mui/material";
 import {
@@ -20,17 +20,16 @@ import { toast } from "react-toastify";
 
 function AddUpdatePost() {
   let location = useLocation();
+  let { id } = useParams();
   const navigate = useNavigate();
-  let id =
-    location.pathname.split("/")[location.pathname.split("/").length - 1];
 
   const formRef = useRef(null);
   const nameRef = useRef(null);
   const contentRef = useRef(null);
 
   const [formErrors, setFormErrors] = useState(undefined);
-  const [post, postApi, cancelPostApi] = useFetch("/api/blog/posts");
-  const [postGet, getPost, cancelPostGet] = useFetch(`/api/blog/posts/${id}`);
+  const [post, postApi, cancelPostApi] = useFetch("/api/posts");
+  const [postGet, getPost, cancelPostGet] = useFetch(`/api/posts/${id}`);
 
   const [state, formAction, isPending] = useActionState(addOrUpdatePostAction, {
     message: "",

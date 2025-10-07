@@ -1,0 +1,7 @@
+.limit-width {
+  width: 80px; /* allow it to shrink with container */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0; /* 🔥 crucial for flexbox children */
+}

@@ -29,7 +29,7 @@ function MoreOptions(props) {
   let { isAuth, userInfo } = useContext(AuthContext);
 
   const [deletePost, deletePostApi, cancelDeletePostApi] = useFetch(
-    `/api/blog/posts/${postId}`
+    `/api/posts/${postId}`
   );
 
   const goEdit = () => {
