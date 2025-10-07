@@ -1,11 +1,13 @@
 import { inject } from '@adonisjs/core'
 
 import UserRepository from '#repositories/user_repository'
+import User from '#models/user';
+import { AccessToken } from '@adonisjs/auth/access_tokens';
 
 @inject()
 export default class AuthService {
   constructor(private users: UserRepository) {}
-  async login(payload) {
+  async login(payload: { email: string; password: string }) {
     try {
       const userLogged = await this.users.verifyCredentials(payload.email, payload.password)
       const token = await this.users.createToken(userLogged)
@@ -35,9 +37,9 @@ export default class AuthService {
     }
   }
 
-  async logout(user, token) {
+  async logout(user: User, token: AccessToken | undefined) {
     if (token) {
-      await this.users.revokeToken(user, token.identifier)
+      await this.users.revokeToken(user, String(token.identifier))
     }
     return {
       status: 200,

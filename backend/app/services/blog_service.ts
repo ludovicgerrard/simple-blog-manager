@@ -1,6 +1,5 @@
 // app/Services/BlogService.ts
 import PostRepository from '#repositories/post_repository'
-import Post from '#models/post'
 
 export default class BlogService {
   constructor(private postRepository: PostRepository) {}

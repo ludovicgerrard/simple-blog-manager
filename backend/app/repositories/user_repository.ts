@@ -1,5 +1,6 @@
 import User from '#models/user'
 import { inject } from '@adonisjs/core'
+import { DateTime } from 'luxon'
 
 @inject()
 export default class UserRepository {
@@ -7,7 +8,7 @@ export default class UserRepository {
     return User.findBy('email', email)
   }
 
-  async create(data) {
+  async create(data: Partial<{ id: number; fullName: string | null; email: string; password: string; createdAt: DateTime<boolean>; updatedAt: DateTime<boolean> | null }>) {
     return User.create(data)
   }
 

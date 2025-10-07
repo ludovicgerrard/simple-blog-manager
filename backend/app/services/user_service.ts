@@ -2,12 +2,14 @@ import { inject } from '@adonisjs/core'
 
 import UserRepository from '#repositories/user_repository'
 import hash from '@adonisjs/core/services/hash'
+import User from '#models/user';
+import { AccessToken } from '@adonisjs/auth/access_tokens';
 
 @inject()
 export default class UserService {
   constructor(private users: UserRepository) {}
 
-  async register(payload) {
+  async register(payload: { fullName: string; email: string; password: string }) {
     const existingUser = await this.users.findByEmail(payload.email)
     if (existingUser) {
       return {
@@ -38,7 +40,7 @@ export default class UserService {
     }
   }
 
-  async profile(user) {
+  async profile(user: User & { currentAccessToken: AccessToken; }) {
     return {
       status: 200,
       body: {
@@ -50,7 +52,7 @@ export default class UserService {
     }
   }
 
-  async changePassword(user, payload) {
+  async changePassword(user: User, payload: { currentPassword: string; newPassword: string; }) {
     const isValid = await hash.verify(user.password, payload.currentPassword)
     if (!isValid) {
       return {
