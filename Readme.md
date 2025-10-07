@@ -112,3 +112,9 @@ npm test
 •  Build Tool: Vite (fast development server)
 •  Notifications: React Toastify
 •  Development: ESLint for code quality
+
+## Notice and issue 
+
+• When mount docker container backend, may got error like "need python install" during building image. I could not find appropriate solution but I restart the computer, relaunch the process to mount container and work successfully
+
+• After mount backend container, maybe got error that not found file "docker-entrypoint.sh" caused by editing or open the file with wrong line ending, to resolve it just save as LF and rerun mounting container process
