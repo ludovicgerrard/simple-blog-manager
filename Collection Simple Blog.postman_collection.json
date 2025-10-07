@@ -31,12 +31,12 @@
 					"formdata": [
 						{
 							"key": "fullName",
-							"value": "Gavin",
+							"value": "No persone",
 							"type": "default"
 						},
 						{
 							"key": "email",
-							"value": "gavin@bellsom.com",
+							"value": "no@one.com",
 							"type": "default"
 						},
 						{
@@ -46,7 +46,7 @@
 						}
 					]
 				},
-				"url": "{{host}}/api/auth/register"
+				"url": "{{host}}/api/register"
 			},
 			"response": []
 		},
@@ -75,7 +75,7 @@
 					"formdata": [
 						{
 							"key": "email",
-							"value": "gavin@bellsom.com",
+							"value": "no@one.com",
 							"type": "text"
 						},
 						{
@@ -85,7 +85,7 @@
 						}
 					]
 				},
-				"url": "{{host}}/api/auth/login"
+				"url": "{{host}}/api/login"
 			},
 			"response": []
 		},
@@ -100,7 +100,7 @@
 				},
 				"method": "GET",
 				"header": [],
-				"url": "{{host}}/api/auth/profile"
+				"url": "{{host}}/api/profile"
 			},
 			"response": []
 		},
@@ -115,7 +115,7 @@
 				},
 				"method": "POST",
 				"header": [],
-				"url": "{{host}}/api/auth/logout"
+				"url": "{{host}}/api/logout"
 			},
 			"response": []
 		},
@@ -127,7 +127,7 @@
 				},
 				"method": "GET",
 				"header": [],
-				"url": "{{host}}/api/blog/posts"
+				"url": "{{host}}/api/posts"
 			},
 			"response": []
 		},
@@ -157,7 +157,7 @@
 						}
 					]
 				},
-				"url": "{{host}}/api/blog/posts"
+				"url": "{{host}}/api/posts"
 			},
 			"response": []
 		},
@@ -187,7 +187,7 @@
 						}
 					]
 				},
-				"url": "{{host}}/api/blog/posts/1"
+				"url": "{{host}}/api/posts/1"
 			},
 			"response": []
 		},
@@ -206,7 +206,7 @@
 					"mode": "formdata",
 					"formdata": []
 				},
-				"url": "{{host}}/api/blog/posts/1"
+				"url": "{{host}}/api/posts/1"
 			},
 			"response": []
 		}
